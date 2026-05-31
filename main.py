@@ -50,6 +50,7 @@ def _render_to_image(md_text: str, theme: str, width: int) -> str:
             "codehilite",
             "nl2br",
             "sane_lists",
+            "pymdownx.tilde",
         ],
         extension_configs={
             "codehilite": {
