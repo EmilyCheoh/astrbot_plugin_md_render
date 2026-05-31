@@ -37,7 +37,7 @@ body {{
     background: {t['bg']};
     color: {t['fg']};
     font-family: -apple-system, "Segoe UI", "Noto Sans SC", "PingFang SC",
-                 "Microsoft YaHei", "Noto Color Emoji", sans-serif;
+                 "Microsoft YaHei", sans-serif;
     font-size: 15px;
     line-height: 1.7;
     padding: 28px 32px;
