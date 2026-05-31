@@ -140,9 +140,13 @@ class MdRenderPlugin(Star):
         /render light    — switch to light theme
         /render <content> — render markdown as image
         """
-        text = event.message_str.strip()
+        raw = event.message_str.strip()
 
-        if not text:
+        # Strip command prefix if message_str includes it
+        if raw.lower().startswith("render"):
+            raw = raw[6:].strip()
+
+        if not raw:
             yield event.plain_result(
                 "Usage:\n/render dark|light — switch theme\n/render <markdown> — render as image"
             )
@@ -150,22 +154,22 @@ class MdRenderPlugin(Star):
 
         # Theme switching
         available = list_themes()
-        if text.lower() in available:
-            self.config["theme"] = text.lower()
+        if raw.lower() in available:
+            self.config["theme"] = raw.lower()
             self.config.save_config()
-            yield event.plain_result(f"Theme set to: {text.lower()}")
+            yield event.plain_result(f"Theme set to: {raw.lower()}")
             return
 
         # Extract content from angle brackets if present
-        if text.startswith("<") and text.endswith(">"):
-            text = text[1:-1].strip()
+        if raw.startswith("<") and raw.endswith(">"):
+            raw = raw[1:-1].strip()
 
         # Render markdown
         theme = self.config.get("theme", "dark")
         width = self.config.get("width", 600)
 
         try:
-            img_path = _render_to_image(text, theme, width)
+            img_path = _render_to_image(raw, theme, width)
             yield event.image_result(img_path)
             if os.path.exists(img_path):
                 os.unlink(img_path)
