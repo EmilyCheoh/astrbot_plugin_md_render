@@ -1,0 +1,19 @@
+{
+  "mode": {
+    "description": "Render mode: 'auto' renders rich markdown automatically; 'manual' only renders on /render command",
+    "type": "string",
+    "default": "auto",
+    "options": ["auto", "manual"]
+  },
+  "theme": {
+    "description": "Color theme for rendered images",
+    "type": "string",
+    "default": "dark",
+    "options": ["dark", "light"]
+  },
+  "width": {
+    "description": "Image width in pixels",
+    "type": "int",
+    "default": 600
+  }
+}
