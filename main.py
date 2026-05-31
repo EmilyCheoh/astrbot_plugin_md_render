@@ -156,6 +156,10 @@ class MdRenderPlugin(Star):
             yield event.plain_result(f"Theme set to: {text.lower()}")
             return
 
+        # Extract content from angle brackets if present
+        if text.startswith("<") and text.endswith(">"):
+            text = text[1:-1].strip()
+
         # Render markdown
         theme = self.config.get("theme", "dark")
         width = self.config.get("width", 600)
