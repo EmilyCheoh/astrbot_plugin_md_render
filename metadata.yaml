@@ -1,6 +1,6 @@
 name: astrbot_plugin_md_render
 display_name: "🎀 MD Render"
 description: Render markdown messages as styled PNG images using wkhtmltoimage
-author: Abyss AI
+author: FA
 version: 1.0.0
 repo: "https://github.com/EmilyCheoh/astrbot_plugin_md_render"

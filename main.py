@@ -93,9 +93,9 @@ class MdRenderPlugin(Star):
         super().__init__(context)
         self.config = config
 
-    @filter.on_decorating_result()
-    async def on_decorating(self, event: AstrMessageEvent):
-        """Hook: after LLM response, before sending. Auto-render if enabled."""
+    @filter.after_message_sent()
+    async def auto_render_after_send(self, event: AstrMessageEvent):
+        """Hook: after text message is sent, render and send image separately."""
         mode = self.config.get("mode", "auto")
         if mode != "auto":
             return
@@ -116,33 +116,21 @@ class MdRenderPlugin(Star):
         if not full_text or not _has_rich_markdown(full_text):
             return
 
-        # Render
+        # Render and send as separate message
         theme = self.config.get("theme", "dark")
         width = self.config.get("width", 600)
 
         try:
             img_path = _render_to_image(full_text, theme, width)
-            # Append image to the message chain (text is already there)
-            result.chain.append(Image.fromFileSystem(img_path))
+            from astrbot.api.event import MessageChain
+            chain = MessageChain().file_image(img_path)
+            await self.context.send_message(event.unified_msg_origin, chain)
             logger.info(f"[md_render] Auto-rendered markdown image ({theme} theme)")
+            # Cleanup
+            if os.path.exists(img_path):
+                os.unlink(img_path)
         except Exception as e:
             logger.error(f"[md_render] Render failed: {e}")
-
-    @filter.after_message_sent()
-    async def cleanup_after_send(self, event: AstrMessageEvent):
-        """Clean up temporary image files after message is sent."""
-        result = event.get_result()
-        if not result or not result.chain:
-            return
-
-        for seg in result.chain:
-            if isinstance(seg, Image) and hasattr(seg, "file"):
-                if seg.file and seg.file.startswith(tempfile.gettempdir()):
-                    try:
-                        if os.path.exists(seg.file):
-                            os.unlink(seg.file)
-                    except Exception:
-                        pass
 
     @filter.command("render")
     async def render_command(self, event: AstrMessageEvent):
